@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru" id="html-tag">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AliChoice — Топ товары</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f7;
+            --card-bg: #ffffff;
+            --text-main: #1d1d1f;
+            --text-muted: #86868b;
+            --accent-color: #ff4742;
+            --accent-hover: #e03e3a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.5; padding-bottom: 60px; }
+        
+        /* RTL и LTR Стили */
+        .dir-ltr { direction: ltr !important; text-align: left !important; }
+        .dir-rtl { direction: rtl !important; text-align: right !important; }
+        
+        header { background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .header-container { max-width: 1100px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 22px; font-weight: 700; color: var(--text-main); text-decoration: none; }
+        .logo span { color: var(--accent-color); }
+        
+        .lang-switcher { display: flex; gap: 8px; }
+        .lang-btn { background: none; border: 1px solid rgba(0,0,0,0.15); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-main); }
+        .lang-btn.active { background-color: var(--text-main); color: #fff; border-color: var(--text-main); }
+        
+        .hero { max-width: 1100px; margin: 120px auto 40px auto; padding: 0 20px; text-align: center; }
+        .hero h1 { font-size: 36px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .hero p { font-size: 18px; color: var(--text-muted); max-width: 650px; margin: 0 auto; }
+        
+        .products-grid { max-width: 1100px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        .product-card { background-color: var(--card-bg); border-radius: 18px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: transform 0.2s; }
+        .product-card:hover { transform: translateY(-5px); }
+        
+        .image-container { position: relative; width: 100%; padding-top: 100%; background-color: #fff; }
+        .product-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .verdict-badge { position: absolute; top: 15px; background-color: #27ae60; color: white; padding: 4px 12px; font-size: 11px; font-weight: 600; border-radius: 20px; text-transform: uppercase; z-index: 10; }
+        
+        .dir-ltr .verdict-badge { left: 15px; right: auto; }
+        .dir-rtl .verdict-badge { right: 15px; left: auto; }
+        
+        .product-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .product-title { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+        .product-review { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; flex-grow: 1; }
+        
+        .product-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 10px; }
+        .dir-rtl .product-footer { flex-direction: row-reverse; }
+        
+        .price { font-size: 20px; font-weight: 700; }
+        .buy-btn { background-color: var(--accent-color); color: white; text-decoration: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; white-space: nowrap; }
+        
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 28px; }
+            .hero p { font-size: 15px; }
+            .products-grid { gap: 20px; padding: 0 15px; }
+        }
+    </style>
+</head>
+<body class="dir-ltr" id="body-tag">
+
+    <header>
+        <div class="header-container" id="header-box">
+            <a href="#" class="logo" id="logo-text">Ali<span>Choice</span></a>
+            <div class="lang-switcher">
+                <button class="lang-btn active" id="btn-ru" onclick="setLanguage('ru')">RU</button>
+                <button class="lang-btn" id="btn-en" onclick="setLanguage('en')">EN</button>
+                <button class="lang-btn" id="btn-he" onclick="setLanguage('he')">HE</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="hero" id="hero-block">
+        <h1 id="hero-title">Только проверенные товары</h1>
+        <p id="hero-desc">Я лично тестирую вещи с AliExpress и делюсь ссылками.</p>
+    </div>
+
+    <main class="products-grid" id="products-container"></main>
+
+    <script>
+        const translations = {
+            ru: {
+                isRtl: false, logo: "Ali<span>Выбор</span>", heroTitle: "Только проверенные товары", heroDesc: "Я лично заказываю, тестирую вещи с AliExpress и делюсь ссылками только на то, что действительно стоит своих денег.", badge: "Проверено", buyBtn: "На AliExpress",
+                products: [
+                    { title: "Кроссовки Baasploa", review: "Мужские профессиональные беговые кроссовки Baasploa: легкие сетчатые кроссовки с дизайнерским оформлением и шнуровкой — для спорта, активного отдыха и тенниса.", price: "USD 36.35", link: "https://s.click.aliexpress.com/e/_c3uYeLbx", img: "https://ae-pic-a1.aliexpress-media.com/kf/S4e78de1542584897b8490c8524763639A.jpg" },
+                    { title: "IP-камера Imou", review: "IP-камера видеонаблюдения Imou Ranger Dual Pro (6 Мп / 8 Мп) для помещений: два объектива, вызов одним касанием, обнаружение людей и домашних животных, Wi-Fi, функции Algo Play и «видеоняня».", price: "USD 65.92", link: "https://s.click.aliexpress.com/e/_c32ZoGSV", img: "https://ae-pic-a1.aliexpress-media.com/kf/Scca8628b8fec4edeb0fea30f0b510fe5Z.jpg" }
+                ]
+            },
+            en: {
+                isRtl: false, logo: "Ali<span>Choice</span>", heroTitle: "Only Approved Products", heroDesc: "I personally order and test items from AliExpress, sharing links only to what is truly worth your money.", badge: "Tested", buyBtn: "Buy on Ali",
+                products: [
+                    { title: "Baasploa Professional Running Shoes", review: "Baasploa Professional Running Shoes For Men Lightweight Men's Designer Mesh Sneakers Lace-Up Male Outdoor Sports Tennis Shoe", price: "USD 36.35", link: "https://s.click.aliexpress.com/e/_c3xyJMil", img: "https://ae-pic-a1.aliexpress-media.com/kf/S4e78de1542584897b8490c8524763639A.jpg" },
+                    { title: "IP Camera Imou", review: "Imou Ranger Dual Pro 6MP/8MP Indoor Dual Lens One-touch Call Human/Pet Detection Wifi Algo Play Baby Security IP Camera", price: "USD 65.92", link: "https://s.click.aliexpress.com/e/_c32ZoGSV", img: "https://ae-pic-a1.aliexpress-media.com/kf/Scca8628b8fec4edeb0fea30f0b510fe5Z.jpg" }
+                ]
+            },
+            he: {
+                isRtl: true, logo: "Ali<span>Choice</span>", heroTitle: "מוצרים שנבדקו בלבד", heroDesc: "אני מזמין ובודק באופן אישי מוצרים מאליאקספרס, ומשתף קישורים רק לדברים שבאמת שווים את הכסף שלכם.", badge: "נבדק", buyBtn: "לקנייה באלי",
+                products: [
+                    { title: "נעלי ריצה מקצועיות לגברים  Baasploa ", review: "סאונד מדהим למחיר. באסים חזקים, סוללה מספיקה לכ-5 שעות עבודה.", price: "USD 36.35", link: "https://s.click.aliexpress.com/e/_c3xyJMil", img: "https://ae-pic-a1.aliexpress-media.com/kf/S4e78de1542584897b8490c8524763639A.jpg" },
+                    { title: "מצלמת אבטחה Imou ", review: "מצלמת אבטחה IP פנימית Imou Ranger Dual Pro (6MP/8MP) עם עדשה כפולה, שיחה בנגיעה אחת, זיהוי בני אדם וחיות מחמד, קישוריות Wi-Fi וניטור תינוקות.", price: "USD 65.92", link: "https://s.click.aliexpress.com/e/_c32ZoGSV", img: "https://ae-pic-a1.aliexpress-media.com/kf/Scca8628b8fec4edeb0fea30f0b510fe5Z.jpg" }
+                ]
+            }
+        };
+
+        function setLanguage(lang) {
+            const data = translations[lang];
+            const bodyTag = document.getElementById('body-tag');
+            const headerBox = document.getElementById('header-box');
+
+            bodyTag.className = data.isRtl ? "dir-rtl" : "dir-ltr";
+            headerBox.style.flexDirection = data.isRtl ? "row-reverse" : "row";
+
+            document.getElementById('logo-text').innerHTML = data.logo;
+            document.getElementById('hero-title').innerText = data.heroTitle;
+            document.getElementById('hero-desc').innerText = data.heroDesc;
+
+            const grid = document.getElementById('products-container');
+            grid.innerHTML = '';
+
+            data.products.forEach(prod => {
+                grid.innerHTML += `
+                    <div class="product-card">
+                        <div class="image-container">
+                            <span class="verdict-badge">${data.badge}</span>
+                            <img src="${prod.img}" alt="${prod.title}" class="product-image">
+                        </div>
+                        <div class="product-info">
+                            <h4 class="product-title">${prod.title}</h4>
+                            <p class="product-review">${prod.review}</p>
+                            <div class="product-footer">
+                                <span class="price">${prod.price}</span>
+                                <a href="${prod.link}" target="_blank" class="buy-btn">${data.buyBtn}</a>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${lang}`).classList.add('active');
+        }
+        setLanguage('ru');
+    </script>
+</body>
+</html>
